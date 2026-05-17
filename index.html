@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>房仲發文公版</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+  :root {
+    --bg: #f7f5f2; --white: #fff; --border: #e8e4df;
+    --text: #1a1814; --text-dim: #9a948c; --accent: #c8521a;
+    --accent-light: #fdf0ea; --fb: #1877f2; --lw: #e8881a;
+    --f591: #2d9e5f; --green: #1a7a3c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Noto Sans TC', sans-serif; min-height: 100vh; }
+  .topbar { background: var(--text); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; gap: 10px; flex-wrap: wrap; }
+  .topbar-title { color: white; font-size: 1rem; font-weight: 900; }
+  .topbar-title span { color: var(--accent); }
+  .topbar-right { display: flex; gap: 8px; flex-wrap: wrap; }
+  .topbar-btn { padding: 7px 14px; border-radius: 7px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: white; font-family: inherit; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+  .topbar-btn.save { background: var(--accent); border-color: var(--accent); }
+  .topbar-btn.saveas { background: #2d9e5f; border-color: #2d9e5f; }
+  .case-name-bar { background: var(--accent-light); padding: 8px 20px; font-size: 0.85rem; font-weight: 700; color: var(--accent); }
+  .container { max-width: 680px; margin: 0 auto; padding: 16px 16px 40px; }
+  .card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .card-label { font-size: 0.72rem; font-weight: 900; letter-spacing: 2px; color: var(--text-dim); }
+  .mini-copy-btn { padding: 5px 12px; border-radius: 6px; border: 1.5px solid var(--border); background: var(--bg); color: var(--text-dim); font-family: inherit; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
+  textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-family: inherit; font-size: 0.9rem; line-height: 1.7; padding: 12px; resize: vertical; }
+  textarea:focus { outline: none; border-color: var(--accent); background: white; }
+  #basicInfo { min-height: 160px; }
+  #advantages { min-height: 200px; }
+  .copy-card { background: var(--text); border-radius: 12px; padding: 20px; margin-bottom: 14px; }
+  .copy-card-label { font-size: 0.72rem; font-weight: 900; letter-spacing: 2px; color: rgba(255,255,255,0.4); margin-bottom: 16px; text-align: center; }
+  .platform-group { margin-bottom: 12px; }
+  .platform-name { font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.4); letter-spacing: 1.5px; margin-bottom: 7px; }
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .copy-btn { padding: 13px 10px; border-radius: 8px; border: none; font-family: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; flex-direction: column; gap: 2px; }
+  .copy-btn.fb { background: var(--fb); }
+  .copy-btn.lw { background: var(--lw); }
+  .copy-btn.f591 { background: var(--f591); }
+  .copy-btn .note { font-size: 0.68rem; opacity: 0.8; font-weight: 500; }
+  .divider { height: 1px; background: rgba(255,255,255,0.1); margin: 12px 0; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.88rem; font-weight: 700; transition: transform 0.3s; z-index: 999; pointer-events: none; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.fb { background: var(--fb); }
+  .toast.lw { background: var(--lw); }
+  .toast.f591 { background: var(--f591); }
+  .toast.saved { background: var(--green); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title">🏠 <span>佳芪</span> 房仲發文工具</div>
+  <div class="topbar-right">
+    <button class="topbar-btn save" onclick="saveData()">💾 儲存</button>
+    <button class="topbar-btn saveas" onclick="saveAsNew()">📥 另存新檔</button>
+    <button class="topbar-btn" onclick="clearAll()">🗑 清空</button>
+  </div>
+</div>
+
+<div class="case-name-bar" id="caseNameBar">📄 公版（尚未儲存）</div>
+
+<div class="container">
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-label">📋 基本資訊（FB使用）</div>
+      <button class="mini-copy-btn" onclick="copyBasic()">📋 複製</button>
+    </div>
+    <textarea id="basicInfo" oninput="onContentChange(); autoFillTitle(this.value)" placeholder="貼上基本資訊文案..."></textarea>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-label">✅ 現況／周邊優勢＋未來發展</div>
+      <button class="mini-copy-btn" onclick="copyAdv()">📋 複製</button>
+    </div>
+    <textarea id="advantages" oninput="onContentChange()" placeholder="貼上現況優勢文案..."></textarea>
+  </div>
+
+  <div class="copy-card">
+    <div class="copy-card-label">📋 一鍵複製完整文案</div>
+
+    <div class="platform-group">
+      <div class="platform-name">📘 Facebook</div>
+      <div class="btn-row">
+        <button class="copy-btn fb" onclick="copyText('fb','A')">💙 阿堯</button>
+        <button class="copy-btn fb" onclick="copyText('fb','B')">😊 阿禾</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="platform-group">
+      <div class="platform-name">🏠 樂屋</div>
+      <div class="btn-row">
+        <button class="copy-btn lw" onclick="copyText('lw','A')">💙 阿堯<span class="note">（手機版）</span></button>
+        <button class="copy-btn lw" onclick="copyText('lw','B')">😊 阿禾<span class="note">（手機版）</span></button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="platform-group">
+      <div class="platform-name">🔑 591</div>
+      <div class="btn-row">
+        <button class="copy-btn f591" onclick="copyText('f591','A')">💙 阿堯</button>
+        <button class="copy-btn f591" onclick="copyText('f591','B')">😊 阿禾</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var AGENTS = {
+  A: {
+    name: '\u963f\u582f',
+    fb: '-\n\ud83d\udc99\u6b61\u8fce\u4f86\u96fb\u9810\u7d04\u8cde\u5c4b\ud83d\udc99\n\ud83d\udc4d\u5c08\u696d\u966a\u4f34\uff0c\u5b89\u5fc3\u6210\u4ea4\n-\n\u6d3d:0975-203-667\u3000\u838a\u535a\u582f \ud83c\udfc6\nLine Id: 0975-203-667\n-\n#\u4e94\u80a1\u6cf0\u5c71\u6700\u4f73\u623f\u4ef2 \u838a\u535a\u582f\n#\u4e94\u80a1\u6cf0\u5c71\u5343\u842c\u7d93\u7d00\u4eba \u838a\u535a\u582f\nhttps://www.df888.com.tw/Staff.aspx?sf=%E8%8E%8A%E5%8D%9A%E5%A0%AF\n\n\u3010\u592a\u5e73\u6d0b\u623f\u5c4b\u3011\u6cf0\u5c71\u52a0\u76df\u5e97\n\u9f0e\u8c50\u5730\u7522\u7d93\u7d00\u6709\u9650\u516c\u53f8 \u7d71\u4e00\u7de8\u865f\uff1a54298963\n\u52a0\u76df\u5e97\u8207\u52a0\u76df\u7e3d\u90e8\u70ba\u4e0d\u540c\u6cd5\u4eba\u8ca1\u52d9\u8207\u6cd5\u5f8b\u8cac\u4efb\u5404\u81ea\u7368\u7acb\n\uff0897\uff09\u6843\u5e02\u7d93\u5b87\u7b2c000928\u865f \u7d93\u7d00\u4eba\uff1a\u738b\u96ea\u829d\n\n\u26a0\ufe0f\u4e0a\u8ff0\u767b\u8f09\u4e4b\u7269\u4ef6\u8cc7\u6599\uff0c\u82e5\u8207\u5be6\u969b\u60c5\u6cc1\u4e0d\u7b26\uff0c\u7686\u4f9d\u5730\u653f\u55ae\u4f4d\u6a5f\u95dc\u767b\u6234\u8cc7\u6599\u70ba\u4e3b\n\u26a0\ufe0f\u82e5\u6709\u624b\u8aa4\u520a\u767b\uff0c\u7d55\u975e\u60e1\u610f\u8aa4\u5c0e\u3002',
+    lw: '-\n\ud83d\udc99\u6b61\u8fce\u4f86\u96fb\u9810\u7d04\u8cde\u5c4b\ud83d\udc99\n\ud83d\udc4d\u5c08\u696d\u966a\u4f34\uff0c\u5b89\u5fc3\u6210\u4ea4\n-\n\u2728\u2728\u2728\u6d3d:0975-203-667\u3000\u838a\u535a\u582f \ud83c\udfc6\nLine Id: 0975-203-667\u2728\u2728\u2728\n-\n#\u4e94\u80a1\u6cf0\u5c71\u6700\u4f73\u623f\u4ef2 \u838a\u535a\u582f\n#\u4e94\u80a1\u6cf0\u5c71\u5343\u842c\u7d93\u7d00\u4eba \u838a\u535a\u582f\n\u3010\u592a\u5e73\u6d0b\u623f\u5c4b\u3011\u6cf0\u5c71\u52a0\u76df\u5e97\n\u9f0e\u8c50\u5730\u7522\u7d93\u7d00\u6709\u9650\u516c\u53f8 \u7d71\u4e00\u7de8\u865f\uff1a54298963\n\u52a0\u76df\u5e97\u8207\u52a0\u76df\u7e3d\u90e8\u70ba\u4e0d\u540c\u6cd5\u4eba\u8ca1\u52d9\u8207\u6cd5\u5f8b\u8cac\u4efb\u5404\u81ea\u7368\u7acb\n\uff0897\uff09\u6843\u5e02\u7d93\u5b87\u7b2c000928\u865f \u7d93\u7d00\u4eba\uff1a\u738b\u96ea\u829d\n\u26a0\ufe0f\u4e0a\u8ff0\u767b\u8f09\u4e4b\u7269\u4ef6\u8cc7\u6599\uff0c\u82e5\u8207\u5be6\u969b\u60c5\u6cc1\u4e0d\u7b26\uff0c\u7686\u4f9d\u5730\u653f\u55ae\u4f4d\u6a5f\u95dc\u767b\u6234\u8cc7\u6599\u70ba\u4e3b\n\u26a0\ufe0f\u82e5\u6709\u624b\u8aa4\u520a\u767b\uff0c\u7d55\u975e\u60e1\u610f\u8aa4\u5c0e\u3002',
+    f591: '-\n\ud83d\udc99\u6b61\u8fce\u4f86\u96fb\u9810\u7d04\u8cde\u5c4b\ud83d\udc99\n\ud83d\udc4d\u5c08\u696d\u966a\u4f34\uff0c\u5b89\u5fc3\u6210\u4ea4\n-\n\u2728\u2728\u2728\u6d3d:0975-203-667\u3000\u838a\u535a\u582f \ud83c\udfc6\nLine Id: 0975-203-667\u2728\u2728\u2728\n-\n#\u4e94\u80a1\u6cf0\u5c71\u6700\u4f73\u623f\u4ef2 \u838a\u535a\u582f\n#\u4e94\u80a1\u6cf0\u5c71\u5343\u842c\u7d93\u7d00\u4eba \u838a\u535a\u582f\n\u3010\u592a\u5e73\u6d0b\u623f\u5c4b\u3011\u6cf0\u5c71\u52a0\u76df\u5e97\n\u9f0e\u8c50\u5730\u7522\u7d93\u7d00\u6709\u9650\u516c\u53f8 \u7d71\u4e00\u7de8\u865f\uff1a54298963\n\u52a0\u76df\u5e97\u8207\u52a0\u76df\u7e3d\u90e8\u70ba\u4e0d\u540c\u6cd5\u4eba\u8ca1\u52d9\u8207\u6cd5\u5f8b\u8cac\u4efb\u5404\u81ea\u7368\u7acb\n\uff0897\uff09\u6843\u5e02\u7d93\u5b87\u7b2c000928\u865f \u7d93\u7d00\u4eba\uff1a\u738b\u96ea\u829d\n\u26a0\ufe0f\u4e0a\u8ff0\u767b\u8f09\u4e4b\u7269\u4ef6\u8cc7\u6599\uff0c\u82e5\u8207\u5be6\u969b\u60c5\u6cc1\u4e0d\u7b26\uff0c\u7686\u4f9d\u5730\u653f\u55ae\u4f4d\u6a5f\u95dc\u767b\u6234\u8cc7\u6599\u70ba\u4e3b\n\u26a0\ufe0f\u82e5\u6709\u624b\u8aa4\u520a\u767b\uff0c\u7d55\u975e\u60e1\u610f\u8aa4\u5c0e\u3002'
+  },
+  B: {
+    name: '\u963f\u79be',
+    fb: '-\n\ud83d\ude0a\u8cb7\u623f\u9019\u4ef6\u4e8b\uff0c\u4ea4\u7d66\u963f\u79be\u5c31\u5c0d\u4e86\ud83d\udc93\n\ud83d\udce9 \u6b61\u8fce\u79c1\u8a0a\u6216\u4f86\u96fb\uff0c\u5b89\u6392\u770b\u5c4b\n\n\ud83d\udd25\u806f\u7d61\u65b9\u5f0f\uff1a\u9673\u65fb\u79be\uff08\u963f\u79be\uff09\n\ud83d\udd25\u806f\u7d61\u96fb\u8a71\uff1a0970-593-587\n\n\u9f0e\u8208\u4e0d\u52d5\u7522\u7d93\u7d00\u6709\u9650\u516c\u53f8.\u52a0\u76df\u5e97\u8207\u52a0\u76df\u7e3d\u90e8\u70ba\u4e0d\u540c\u6cd5\u4eba \n\u7d93\u7d00\u8b49\u7167:\u8b1d\u5b9b\u81fb(110)\u65b0\u5317\u7d93\u5b57\u7b2c003891\u865f\n\u5730\u5740:\u4e94\u80a1\u5340\u82b3\u6d32\u516b\u8def105\u865f\u7d71\u7de8:24704296\n\u26a0\ufe0f\u4e0a\u8ff0\u767b\u8f09\u4e4b\u7269\u4ef6\u8cc7\u6599\uff0c\u82e5\u8207\u5be6\u969b\u60c5\u6cc1\u4e0d\u7b26\uff0c\u7686\u4f9d\u5730\u653f\u55ae\u4f4d\u6a5f\u95dc\u767b\u6234\u8cc7\u6599\u70ba\u4e3b\n\u26a0\ufe0f\u82e5\u6709\u624b\u8aa4\u520a\u767b\uff0c\u7d55\u975e\u60e1\u610f\u8aa4\u5c0e\u3002',
+    lw: '-\n\ud83d\ude0a\u8cb7\u623f\u9019\u4ef6\u4e8b\uff0c\u4ea4\u7d66\u963f\u79be\u5c31\u5c0d\u4e86\ud83d\udc93\n\ud83d\udce9 \u6b61\u8fce\u79c1\u8a0a\u6216\u4f86\u96fb\uff0c\u5b89\u6392\u770b\u5c4b\n\ud83d\udd25\u806f\u7d61\u65b9\u5f0f\uff1a\u9673\u65fb\u79be\uff08\u963f\u79be\uff09\n\ud83d\udd25\u806f\u7d61\u96fb\u8a71\uff1a0970-593-587\n\u9f0e\u8208\u4e0d\u52d5\u7522\u7d93\u7d00\u6709\u9650\u516c\u53f8.\u52a0\u76df\u5e97\u8207\u52a0\u76df\u7e3d\u90e8\u70ba\u4e0d\u540c\u6cd5\u4eba \n\u7d93\u7d00\u8b49\u7167:\u8b1d\u5b9b\u81fb(110)\u65b0\u5317\u7d93\u5b57\u7b2c003891\u865f\n\u5730\u5740:\u4e94\u80a1\u5340\u82b3\u6d32\u516b\u8def105\u865f\u7d71\u7de8:24704296\n\u26a0\ufe0f\u4e0a\u8ff0\u767b\u8f09\u4e4b\u7269\u4ef6\u8cc7\u6599\uff0c\u82e5\u8207\u5be6\u969b\u60c5\u6cc1\u4e0d\u7b26\uff0c\u7686\u4f9d\u5730\u653f\u55ae\u4f4d\u6a5f\u95dc\u767b\u6234\u8cc7\u6599\u70ba\u4e3b\n\u26a0\ufe0f\u82e5\u6709\u624b\u8aa4\u520a\u767b\uff0c\u7d55\u975e\u60e1\u610f\u8aa4\u5c0e\u3002',
+    f591: '-\n\ud83d\ude0a\u8cb7\u623f\u9019\u4ef6\u4e8b\uff0c\u4ea4\u7d66\u963f\u79be\u5c31\u5c0d\u4e86\ud83d\udc93\n\ud83d\udce9 \u6b61\u8fce\u79c1\u8a0a\u6216\u4f86\u96fb\uff0c\u5b89\u6392\u770b\u5c4b\n\ud83d\udd25\u806f\u7d61\u65b9\u5f0f\uff1a\u9673\u65fb\u79be\uff08\u963f\u79be\uff09\n\ud83d\udd25\u806f\u7d61\u96fb\u8a71\uff1a0970-593-587\n\u9f0e\u8208\u4e0d\u52d5\u7522\u7d93\u7d00\u6709\u9650\u516c\u53f8.\u52a0\u76df\u5e97\u8207\u52a0\u76df\u7e3d\u90e8\u70ba\u4e0d\u540c\u6cd5\u4eba \n\u7d93\u7d00\u8b49\u7167:\u8b1d\u5b9b\u81fb(110)\u65b0\u5317\u7d93\u5b57\u7b2c003891\u865f\n\u5730\u5740:\u4e94\u80a1\u5340\u82b3\u6d32\u516b\u8def105\u865f\u7d71\u7de8:24704296\n\u26a0\ufe0f\u4e0a\u8ff0\u767b\u8f09\u4e4b\u7269\u4ef6\u8cc7\u6599\uff0c\u82e5\u8207\u5be6\u969b\u60c5\u6cc1\u4e0d\u7b26\uff0c\u7686\u4f9d\u5730\u653f\u55ae\u4f4d\u6a5f\u95dc\u767b\u6234\u8cc7\u6599\u70ba\u4e3b\n\u26a0\ufe0f\u82e5\u6709\u624b\u8aa4\u520a\u767b\uff0c\u7d55\u975e\u60e1\u610f\u8aa4\u5c0e\u3002'
+  }
+};
+
+function getStorageKey() {
+  var filename = location.pathname.split('/').pop() || 'index.html';
+  return 'realty_' + filename;
+}
+
+var isDirty = false;
+var caseName = '';
+
+function onContentChange() { isDirty = true; }
+
+function autoFillTitle(text) {
+  var match = text.match(/\u3010\u6848\u540d\u3011[\uff1a:]\s*(.+)/);
+  if (match) {
+    caseName = match[1].trim();
+    document.getElementById('caseNameBar').textContent = '\ud83c\udfe0 ' + caseName;
+  }
+}
+
+function saveData() {
+  var basic = document.getElementById('basicInfo').value;
+  var adv = document.getElementById('advantages').value;
+  try {
+    localStorage.setItem(getStorageKey(), JSON.stringify({ basic: basic, adv: adv, caseName: caseName }));
+    isDirty = false;
+    showToast('\u2705 \u5df2\u5132\u5b58\uff01', 'saved');
+    document.getElementById('caseNameBar').textContent = '\ud83c\udfe0 ' + (caseName || '\u672a\u547d\u540d') + ' \u2705\u5df2\u5132\u5b58';
+  } catch(e) {
+    showToast('\u26a0\ufe0f \u5132\u5b58\u5931\u6557', '');
+  }
+}
+
+function loadData() {
+  try {
+    var saved = JSON.parse(localStorage.getItem(getStorageKey()));
+    if (saved) {
+      document.getElementById('basicInfo').value = saved.basic || '';
+      document.getElementById('advantages').value = saved.adv || '';
+      caseName = saved.caseName || '';
+      if (caseName) document.getElementById('caseNameBar').textContent = '\ud83c\udfe0 ' + caseName;
+    }
+  } catch(e) {}
+}
+
+function clearAll() {
+  if (isDirty && !confirm('\u6e05\u7a7a\u5f8c\u672a\u5132\u5b58\u7684\u5167\u5bb9\u6703\u6d88\u5931\uff0c\u78ba\u5b9a\u55ce\uff1f')) return;
+  document.getElementById('basicInfo').value = '';
+  document.getElementById('advantages').value = '';
+  caseName = '';
+  isDirty = false;
+  document.getElementById('caseNameBar').textContent = '\ud83d\udcc4 \u516c\u7248\uff08\u5c1a\u672a\u5132\u5b58\uff09';
+  showToast('\ud83d\uddd1 \u5df2\u6e05\u7a7a', '');
+}
+
+function saveAsNew() {
+  var name = caseName || prompt('\u8acb\u8f38\u5165\u6848\u4ef6\u540d\u7a31\uff1a');
+  if (!name) return;
+  var basic = document.getElementById('basicInfo').value;
+  var adv = document.getElementById('advantages').value;
+  var data = { basic: basic, adv: adv, caseName: name };
+  var encoded = encodeURIComponent(JSON.stringify(data));
+  var html = document.documentElement.outerHTML;
+  var injection = '<script>document.addEventListener("DOMContentLoaded",function(){try{var d=JSON.parse(decodeURIComponent("' + encoded + '"));document.getElementById("basicInfo").value=d.basic;document.getElementById("advantages").value=d.adv;caseName=d.caseName;document.getElementById("caseNameBar").textContent="\\uD83C\\uDFE0 "+d.caseName;localStorage.setItem(getStorageKey(),JSON.stringify(d));}catch(e){}});<\/script>';
+  html = html.replace('</body>', injection + '</body>');
+  var blob = new Blob([html], {type: 'text/html;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = name + '.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('\ud83d\udce5 \u5df2\u4e0b\u8f09 ' + name + '.html', 'saved');
+}
+
+window.addEventListener('beforeunload', function(e) {
+  if (isDirty) {
+    e.preventDefault();
+    e.returnValue = '';
+    return '';
+  }
+});
+
+function copyBasic() {
+  var text = document.getElementById('basicInfo').value.trim();
+  if (!text) { showToast('\u26a0\ufe0f \u8acb\u5148\u8cbc\u4e0a\u57fa\u672c\u8cc7\u8a0a\uff01', ''); return; }
+  doCopy(text);
+  showToast('\ud83d\udccb \u5df2\u8907\u88fd\u57fa\u672c\u8cc7\u8a0a\uff01', 'saved');
+}
+
+function copyAdv() {
+  var text = document.getElementById('advantages').value.trim();
+  if (!text) { showToast('\u26a0\ufe0f \u8acb\u5148\u8cbc\u4e0a\u73fe\u6cc1\u512a\u52e2\uff01', ''); return; }
+  doCopy(text);
+  showToast('\ud83d\udccb \u5df2\u8907\u88fd\u73fe\u6cc1\u512a\u52e2\uff01', 'saved');
+}
+
+function copyText(platform, agent) {
+  var basic = document.getElementById('basicInfo').value.trim();
+  var adv = document.getElementById('advantages').value.trim();
+  var contact = AGENTS[agent][platform];
+  if (!basic && !adv) { showToast('\u26a0\ufe0f \u8acb\u5148\u8cbc\u4e0a\u6587\u6848\uff01', ''); return; }
+  var text;
+  if (platform === 'fb') {
+    text = [basic, adv, contact].filter(Boolean).join('\n\n');
+  } else {
+    text = [adv, contact].filter(Boolean).join('\n\n');
+  }
+  doCopy(text);
+  var pname = platform === 'fb' ? 'FB' : (platform === 'lw' ? '\u6a02\u5c4b' : '591');
+  showToast('\u2705 \u5df2\u8907\u88fd ' + pname + ' ' + AGENTS[agent].name + '\u7248\uff01', platform);
+}
+
+function doCopy(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).catch(function(){ fallbackCopy(text); });
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.top = '0';
+  ta.style.left = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type || '') + ' show';
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+
+loadData();
+</script>
+</body>
+</html>
