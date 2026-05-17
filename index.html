@@ -516,19 +516,22 @@ function saveAsNew() {
     window.__savedCaseName = ${JSON.stringify(name)};
   <\/script>`;
   
-const newHtml = html.replace('// 初始化\nloadData();',
-loadData();', 
-    `// 初始化
-    if(window.__savedBasic !== undefined) {
-      document.getElementById('basicInfo').value = window.__savedBasic;
-      document.getElementById('advantages').value = window.__savedAdv;
-      caseName = window.__savedCaseName;
-      document.getElementById('caseNameBar').textContent = '🏠 ' + caseName;
-      localStorage.setItem('realty_' + '${name}.html', JSON.stringify({basic: window.__savedBasic, adv: window.__savedAdv, caseName: window.__savedCaseName}));
-    } else {
-      loadData();
-    }`
-  );
+const newHtml = html.replace('// 初始化\\nloadData();',
+'// 初始化\n' +
+'if(window.__savedBasic !== undefined) {\n' +
+'    document.getElementById("basicInfo").value = window.__savedBasic;\n' +
+'    document.getElementById("advantages").value = window.__savedAdv;\n' +
+'    caseName = window.__savedCaseName;\n' +
+'    document.getElementById("caseNameBar").textContent = "🏠 " + caseName;\n' +
+'    localStorage.setItem("realty_" + "' + name + '.html", JSON.stringify({\n' +
+'        basic: window.__savedBasic,\n' +
+'        adv: window.__savedAdv,\n' +
+'        caseName: window.__savedCaseName\n' +
+'    }));\n' +
+'} else {\n' +
+'    loadData();\n' +
+'}'
+);
   
   const blob = new Blob([dataScript + newHtml], {type: 'text/html;charset=utf-8'});
   const url = URL.createObjectURL(blob);
