@@ -516,7 +516,7 @@ function saveAsNew() {
     window.__savedCaseName = ${JSON.stringify(name)};
   <\/script>`;
   
-  const newHtml = html.replace('// 初始化
+const newHtml = html.replace('// 初始化\nloadData();',
 loadData();', 
     `// 初始化
     if(window.__savedBasic !== undefined) {
