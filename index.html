@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>房仲發文公版</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+
+  :root {
+    --bg: #f7f5f2;
+    --white: #ffffff;
+    --border: #e8e4df;
+    --text: #1a1814;
+    --text-dim: #9a948c;
+    --accent: #c8521a;
+    --accent-light: #fdf0ea;
+    --fb: #1877f2;
+    --lw: #e8881a;
+    --f591: #2d9e5f;
+    --green: #1a7a3c;
+    --red: #c81a1a;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    background: var(--text);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 10px;
+  }
+  .topbar-title { color: white; font-size: 1rem; font-weight: 900; letter-spacing: 1px; white-space: nowrap; }
+  .topbar-title span { color: var(--accent); }
+  .topbar-right { display: flex; gap: 8px; }
+
+  .topbar-btn {
+    padding: 7px 14px;
+    border-radius: 7px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: transparent;
+    color: white;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .topbar-btn:hover { background: rgba(255,255,255,0.1); }
+  .topbar-btn.save { background: var(--accent); border-color: var(--accent); }
+  .topbar-btn.save:hover { background: #a8401a; }
+
+  .case-name-bar {
+    background: var(--accent-light);
+    border-bottom: 1px solid #f0d5c0;
+    padding: 8px 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .container { max-width: 680px; margin: 0 auto; padding: 16px 16px 40px; }
+
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .card-label {
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .mini-copy-btn {
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--text-dim);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .mini-copy-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+  textarea {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    padding: 12px;
+    resize: vertical;
+    transition: border-color 0.15s;
+  }
+  textarea:focus { outline: none; border-color: var(--accent); background: white; }
+  textarea::placeholder { color: var(--text-dim); }
+  #basicInfo { min-height: 160px; }
+  #advantages { min-height: 200px; }
+
+  .copy-card {
+    background: var(--text);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 14px;
+  }
+  .copy-card-label {
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .platform-group { margin-bottom: 12px; }
+  .platform-name {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .copy-btn {
+    padding: 13px 10px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    line-height: 1.3;
+    text-align: center;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .copy-btn:active { transform: scale(0.97); }
+  .copy-btn.fb { background: var(--fb); }
+  .copy-btn.fb:hover { background: #1564d8; }
+  .copy-btn.lw { background: var(--lw); }
+  .copy-btn.lw:hover { background: #c87010; }
+  .copy-btn.f591 { background: var(--f591); }
+  .copy-btn.f591:hover { background: #1f7a45; }
+  .copy-btn .note { font-size: 0.68rem; opacity: 0.8; font-weight: 500; }
+  .divider { height: 1px; background: rgba(255,255,255,0.1); margin: 12px 0; }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--text);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 999;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.fb { background: var(--fb); }
+  .toast.lw { background: var(--lw); }
+  .toast.f591 { background: var(--f591); }
+  .toast.saved { background: var(--green); }
+  .toast.basic { background: #7a5c3a; }
+  .toast.adv { background: #3a7a5c; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title">🏠 <span>佳芪</span> 房仲發文工具</div>
+  <div class="topbar-right">
+    <button class="topbar-btn save" onclick="saveData()">💾 儲存</button>
+    <button class="topbar-btn" onclick="saveAsNew()" style="background:#2d9e5f;border-color:#2d9e5f;">📥 另存新檔</button>
+    <button class="topbar-btn" onclick="clearAll()">🗑 清空</button>
+  </div>
+</div>
+
+<div class="case-name-bar" id="caseNameBar">📄 公版（尚未儲存）</div>
+
+<div class="container">
+
+  <!-- 基本資訊 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-label">📋 基本資訊（FB使用）</div>
+      <button class="mini-copy-btn" onclick="copyBasic()">📋 複製</button>
+    </div>
+    <textarea id="basicInfo" oninput="onContentChange(); autoFillTitle(this.value)" placeholder="貼上基本資訊文案...
+
+例：
+【出售文】
+【案名】：大戶最愛皇家四房車
+【地區】：新北市五股區西雲路
+【開價】：1550萬
+..."></textarea>
+  </div>
+
+  <!-- 現況優勢 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-label">✅ 現況／周邊優勢＋未來發展</div>
+      <button class="mini-copy-btn" onclick="copyAdv()">📋 複製</button>
+    </div>
+    <textarea id="advantages" oninput="onContentChange()" placeholder="貼上現況優勢文案...
+
+例：
+【🏡現況 / 週邊優勢】
+✅ 面社區中庭，居住氛圍寧靜舒適
+...
+
+【🚧 未來發展】
+✅ 區域持續發展中
+..."></textarea>
+  </div>
+
+  <!-- 複製按鈕 -->
+  <div class="copy-card">
+    <div class="copy-card-label">📋 一鍵複製完整文案</div>
+
+    <div class="platform-group">
+      <div class="platform-name">📘 Facebook</div>
+      <div class="btn-row">
+        <button class="copy-btn fb" onclick="copyText('fb','A')">💙 阿堯</button>
+        <button class="copy-btn fb" onclick="copyText('fb','B')">😊 阿禾</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="platform-group">
+      <div class="platform-name">🏠 樂屋</div>
+      <div class="btn-row">
+        <button class="copy-btn lw" onclick="copyText('lw','A')">💙 阿堯<span class="note">（手機版）</span></button>
+        <button class="copy-btn lw" onclick="copyText('lw','B')">😊 阿禾<span class="note">（手機版）</span></button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="platform-group">
+      <div class="platform-name">🔑 591</div>
+      <div class="btn-row">
+        <button class="copy-btn f591" onclick="copyText('f591','A')">💙 阿堯</button>
+        <button class="copy-btn f591" onclick="copyText('f591','B')">😊 阿禾</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const AGENTS = {
+  A: {
+    name: '阿堯',
+    fb: `-
+💙歡迎來電預約賞屋💙
+👍專業陪伴，安心成交
+-
+洽:0975-203-667　莊博堯 🏆
+Line Id: 0975-203-667
+-
+#五股泰山最佳房仲 莊博堯
+#五股泰山千萬經紀人 莊博堯
+https://www.df888.com.tw/Staff.aspx?sf=%E8%8E%8A%E5%8D%9A%E5%A0%AF
+
+【太平洋房屋】泰山加盟店
+鼎豐地產經紀有限公司 統一編號：54298963
+加盟店與加盟總部為不同法人財務與法律責任各自獨立
+（97）桃市經宇第000928號 經紀人：王雪芝
+
+⚠️上述登載之物件資料，若與實際情況不符，皆依地政單位機關登戴資料為主
+⚠️若有手誤刊登，絕非惡意誤導。`,
+    lw: `-
+💙歡迎來電預約賞屋💙
+👍專業陪伴，安心成交
+-
+✨✨✨洽:0975-203-667　莊博堯 🏆
+Line Id: 0975-203-667✨✨✨
+-
+#五股泰山最佳房仲 莊博堯
+#五股泰山千萬經紀人 莊博堯
+【太平洋房屋】泰山加盟店
+鼎豐地產經紀有限公司 統一編號：54298963
+加盟店與加盟總部為不同法人財務與法律責任各自獨立
+（97）桃市經宇第000928號 經紀人：王雪芝
+⚠️上述登載之物件資料，若與實際情況不符，皆依地政單位機關登戴資料為主
+⚠️若有手誤刊登，絕非惡意誤導。`,
+    f591: `-
+💙歡迎來電預約賞屋💙
+👍專業陪伴，安心成交
+-
+✨✨✨洽:0975-203-667　莊博堯 🏆
+Line Id: 0975-203-667✨✨✨
+-
+#五股泰山最佳房仲 莊博堯
+#五股泰山千萬經紀人 莊博堯
+【太平洋房屋】泰山加盟店
+鼎豐地產經紀有限公司 統一編號：54298963
+加盟店與加盟總部為不同法人財務與法律責任各自獨立
+（97）桃市經宇第000928號 經紀人：王雪芝
+⚠️上述登載之物件資料，若與實際情況不符，皆依地政單位機關登戴資料為主
+⚠️若有手誤刊登，絕非惡意誤導。`
+  },
+  B: {
+    name: '阿禾',
+    fb: `-
+😊買房這件事，交給阿禾就對了💓
+📩 歡迎私訊或來電，安排看屋
+
+🔥聯絡方式：陳旻禾（阿禾）
+🔥聯絡電話：0970-593-587
+
+鼎興不動產經紀有限公司.加盟店與加盟總部為不同法人 
+經紀證照:謝宛臻(110)新北經字第003891號
+地址:五股區芳洲八路105號統編:24704296
+⚠️上述登載之物件資料，若與實際情況不符，皆依地政單位機關登戴資料為主
+⚠️若有手誤刊登，絕非惡意誤導。`,
+    lw: `-
+😊買房這件事，交給阿禾就對了💓
+📩 歡迎私訊或來電，安排看屋
+🔥聯絡方式：陳旻禾（阿禾）
+🔥聯絡電話：0970-593-587
+鼎興不動產經紀有限公司.加盟店與加盟總部為不同法人 
+經紀證照:謝宛臻(110)新北經字第003891號
+地址:五股區芳洲八路105號統編:24704296
+⚠️上述登載之物件資料，若與實際情況不符，皆依地政單位機關登戴資料為主
+⚠️若有手誤刊登，絕非惡意誤導。`,
+    f591: `-
+😊買房這件事，交給阿禾就對了💓
+📩 歡迎私訊或來電，安排看屋
+🔥聯絡方式：陳旻禾（阿禾）
+🔥聯絡電話：0970-593-587
+鼎興不動產經紀有限公司.加盟店與加盟總部為不同法人 
+經紀證照:謝宛臻(110)新北經字第003891號
+地址:五股區芳洲八路105號統編:24704296
+⚠️上述登載之物件資料，若與實際情況不符，皆依地政單位機關登戴資料為主
+⚠️若有手誤刊登，絕非惡意誤導。`
+  }
+};
+
+// ── 用檔名當key，各案件各自獨立 ──
+function getStorageKey() {
+  const path = location.href;
+  const filename = path.split('/').pop().split('\\').pop();
+  return 'realty_' + filename;
+}
+
+let isDirty = false;
+let caseName = '';
+
+function onContentChange() { isDirty = true; }
+
+function autoFillTitle(text) {
+  const match = text.match(/【案名】[：:]\s*(.+)/);
+  if (match) {
+    caseName = match[1].trim();
+    document.getElementById('caseNameBar').textContent = '🏠 ' + caseName + (isDirty ? ' ●未儲存' : '');
+  }
+}
+
+function saveData() {
+  const basic = document.getElementById('basicInfo').value;
+  const adv = document.getElementById('advantages').value;
+  const key = getStorageKey();
+  localStorage.setItem(key, JSON.stringify({ basic, adv, caseName }));
+  isDirty = false;
+  const bar = document.getElementById('caseNameBar');
+  bar.textContent = '🏠 ' + (caseName || '未命名案件') + ' ✅已儲存';
+  showToast('✅ 已儲存！', 'saved');
+  setTimeout(() => {
+    bar.textContent = '🏠 ' + (caseName || '未命名案件');
+  }, 2000);
+}
+
+function loadData() {
+  const key = getStorageKey();
+  try {
+    const saved = JSON.parse(localStorage.getItem(key));
+    if (saved) {
+      document.getElementById('basicInfo').value = saved.basic || '';
+      document.getElementById('advantages').value = saved.adv || '';
+      caseName = saved.caseName || '';
+      document.getElementById('caseNameBar').textContent = caseName ? '🏠 ' + caseName : '📄 公版（尚未儲存）';
+    }
+  } catch(e) {}
+}
+
+function clearAll() {
+  if (isDirty && !confirm('清空後未儲存的內容會消失，確定嗎？')) return;
+  document.getElementById('basicInfo').value = '';
+  document.getElementById('advantages').value = '';
+  caseName = '';
+  isDirty = false;
+  document.getElementById('caseNameBar').textContent = '📄 公版（尚未儲存）';
+  showToast('🗑 已清空', '');
+}
+
+// 關閉前提示
+window.addEventListener('beforeunload', function(e) {
+  if (isDirty) {
+    e.preventDefault();
+    e.returnValue = '有未儲存的內容，確定要離開嗎？';
+    return e.returnValue;
+  }
+});
+
+// ── 複製功能 ──
+function copyBasic() {
+  const text = document.getElementById('basicInfo').value.trim();
+  if (!text) { showToast('⚠️ 請先貼上基本資訊！', ''); return; }
+  doCopy(text);
+  showToast('📋 已複製基本資訊！', 'basic');
+}
+
+function copyAdv() {
+  const text = document.getElementById('advantages').value.trim();
+  if (!text) { showToast('⚠️ 請先貼上現況優勢！', ''); return; }
+  doCopy(text);
+  showToast('📋 已複製現況優勢！', 'adv');
+}
+
+function copyText(platform, agent) {
+  const basic = document.getElementById('basicInfo').value.trim();
+  const adv = document.getElementById('advantages').value.trim();
+  const contact = AGENTS[agent][platform];
+  if (!basic && !adv) { showToast('⚠️ 請先貼上文案！', ''); return; }
+  const text = platform === 'fb'
+    ? [basic, adv, contact].filter(Boolean).join('\n\n')
+    : [adv, contact].filter(Boolean).join('\n\n');
+  doCopy(text);
+  const pname = { fb: 'FB', lw: '樂屋', f591: '591' }[platform];
+  showToast(`✅ 已複製 ${pname} ${AGENTS[agent].name}版！`, platform);
+}
+
+function doCopy(text) {
+  navigator.clipboard.writeText(text).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function saveAsNew() {
+  const basic = document.getElementById('basicInfo').value;
+  const adv = document.getElementById('advantages').value;
+  
+  let name = caseName;
+  if (!name) {
+    name = prompt('請輸入案件名稱：');
+    if (!name) return;
+  }
+  
+  // Get current HTML and inject saved data
+  const html = document.documentElement.outerHTML;
+  const dataScript = `<script>
+    window.__savedBasic = ${JSON.stringify(basic)};
+    window.__savedAdv = ${JSON.stringify(adv)};
+    window.__savedCaseName = ${JSON.stringify(name)};
+  <\/script>`;
+  
+  const newHtml = html.replace('// 初始化
+loadData();', 
+    `// 初始化
+    if(window.__savedBasic !== undefined) {
+      document.getElementById('basicInfo').value = window.__savedBasic;
+      document.getElementById('advantages').value = window.__savedAdv;
+      caseName = window.__savedCaseName;
+      document.getElementById('caseNameBar').textContent = '🏠 ' + caseName;
+      localStorage.setItem('realty_' + '${name}.html', JSON.stringify({basic: window.__savedBasic, adv: window.__savedAdv, caseName: window.__savedCaseName}));
+    } else {
+      loadData();
+    }`
+  );
+  
+  const blob = new Blob([dataScript + newHtml], {type: 'text/html;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name + '.html';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('📥 已下載「' + name + '.html」', 'saved');
+}
+
+// 初始化
+loadData();
+</script>
+</body>
+</html>
