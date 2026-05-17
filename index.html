@@ -510,27 +510,18 @@ function saveAsNew() {
   
   // Get current HTML and inject saved data
   const html = document.documentElement.outerHTML;
-  const dataScript = `<script>
-    window.__savedBasic = ${JSON.stringify(basic)};
-    window.__savedAdv = ${JSON.stringify(adv)};
-    window.__savedCaseName = ${JSON.stringify(name)};
-  <\/script>`;
+  const injectScript = `
+window.__savedBasic = ${JSON.stringify(basic)};
+window.__savedAdv = ${JSON.stringify(adv)};
+window.__savedCaseName = ${JSON.stringify(name)};
+`;
   
-const newHtml = html.replace('// 初始化\\nloadData();',
-'// 初始化\n' +
-'if(window.__savedBasic !== undefined) {\n' +
-'    document.getElementById("basicInfo").value = window.__savedBasic;\n' +
-'    document.getElementById("advantages").value = window.__savedAdv;\n' +
-'    caseName = window.__savedCaseName;\n' +
-'    document.getElementById("caseNameBar").textContent = "🏠 " + caseName;\n' +
-'    localStorage.setItem("realty_" + "' + name + '.html", JSON.stringify({\n' +
-'        basic: window.__savedBasic,\n' +
-'        adv: window.__savedAdv,\n' +
-'        caseName: window.__savedCaseName\n' +
-'    }));\n' +
-'} else {\n' +
-'    loadData();\n' +
-'}'
+const newHtml = html.replace(
+'<head>',
+`<head>
+<script>
+${injectScript}
+</script>`
 );
   
   const blob = new Blob([dataScript + newHtml], {type: 'text/html;charset=utf-8'});
