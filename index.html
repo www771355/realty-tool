@@ -513,37 +513,43 @@ function saveAsNew() {
 
     const html = document.documentElement.outerHTML;
 
-    const injectScript = `
+    const dataScript = `<script>
 window.__savedBasic = ${JSON.stringify(basic)};
 window.__savedAdv = ${JSON.stringify(adv)};
 window.__savedCaseName = ${JSON.stringify(name)};
-`;
+</script>`;
 
     const newHtml = html.replace(
-        '<head>',
-        `<head>
-<script>
-${injectScript}
-</script>`
+        '// 初始化 loadData();',
+        `
+if(window.__savedBasic !== undefined){
+    document.getElementById('basicInfo').value = window.__savedBasic;
+}
+
+if(window.__savedAdv !== undefined){
+    document.getElementById('advantages').value = window.__savedAdv;
+}
+
+if(window.__savedCaseName !== undefined){
+    caseName = window.__savedCaseName;
+}
+
+loadData();
+`
     );
 
-    const blob = new Blob([newHtml], {
-        type: 'text/html;charset=utf-8'
+    const blob = new Blob([dataScript + newHtml], {
+        type:'text/html;charset=utf-8'
     });
 
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement('a');
 
-a.href = url;
-a.download = name + '.html';
-a.target = '_blank';
+    a.href = url;
+    a.download = name + '.html';
 
-document.body.appendChild(a);
-
-a.click();
-
-document.body.removeChild(a);
+    a.click();
 
     URL.revokeObjectURL(url);
 
