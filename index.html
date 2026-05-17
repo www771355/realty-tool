@@ -499,30 +499,51 @@ function showToast(msg, type) {
 }
 
 function saveAsNew() {
-  const basic = document.getElementById('basicInfo').value;
-  const adv = document.getElementById('advantages').value;
-  
-  let name = caseName;
-  if (!name) {
-    name = prompt('請輸入案件名稱：');
+
+    const basic = document.getElementById('basicInfo').value;
+    const adv = document.getElementById('advantages').value;
+
+    let name = caseName;
+
+    if (!name) {
+        name = prompt('請輸入案件名稱：');
+    }
+
     if (!name) return;
-  }
-  
-  // Get current HTML and inject saved data
-  const html = document.documentElement.outerHTML;
-  const injectScript = `
+
+    const html = document.documentElement.outerHTML;
+
+    const injectScript = `
 window.__savedBasic = ${JSON.stringify(basic)};
 window.__savedAdv = ${JSON.stringify(adv)};
 window.__savedCaseName = ${JSON.stringify(name)};
 `;
-  
-const newHtml = html.replace(
-'<head>',
-`<head>
+
+    const newHtml = html.replace(
+        '<head>',
+        `<head>
 <script>
 ${injectScript}
 </script>`
-);
+    );
+
+    const blob = new Blob([newHtml], {
+        type: 'text/html;charset=utf-8'
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+
+    a.href = url;
+    a.download = name + '.html';
+
+    a.click();
+
+    URL.revokeObjectURL(url);
+
+    showToast('📦 已下載『' + name + '.html』', 'saved');
+}
   
   const blob = new Blob([dataScript + newHtml], {type: 'text/html;charset=utf-8'});
   const url = URL.createObjectURL(blob);
